@@ -1,19 +1,23 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { ProductCard } from "@/components/ProductCard";
-import { LabReportModal } from "@/components/LabReportModal";
+import { ProductDetailModal } from "@/components/ProductDetailModal";
+import { InstagramReelsSection } from "@/components/InstagramReelsSection";
+import { TestimonialsSection } from "@/components/TestimonialsSection";
+import { AboutUsSection } from "@/components/AboutUsSection";
 import { CartDrawer } from "@/components/CartDrawer";
 import { BuyerDashboard } from "@/components/BuyerDashboard";
 import { AdminConsole } from "@/components/AdminConsole";
 import { DriverPwa } from "@/components/DriverPwa";
 import { 
-  ShieldCheck, Award, Truck, Sparkles, Search, 
-  Filter, CheckCircle2, ChevronRight, Phone, Mail, MapPin 
+  ShieldCheck, Truck, Sparkles, Search, 
+  CheckCircle2, ChevronRight, Phone, Mail, MapPin, 
+  Clock, ArrowRight, Building2, Flame, Award 
 } from "lucide-react";
 
-// Default Master Products
+// Master Products With High-Resolution Images & Full Specs
 const INITIAL_PRODUCTS = [
   {
     id: "prod-01",
@@ -26,9 +30,10 @@ const INITIAL_PRODUCTS = [
     gst_rate: 0.0,
     origin: "Sehore, Madhya Pradesh & Rajasthan",
     grade: "Grade A+ Golden Grain",
-    description: "Stone ground chakki atta from hand-sorted golden Sharbati wheat grains. Rotis puff high and remain soft for over 8 hours.",
+    description: "Stone ground chakki atta from hand-sorted golden Sharbati wheat grains. Rotis puff high and remain soft for over 8 hours in commercial kitchen warmers.",
     shelf_life_days: 90,
     is_perishable: false,
+    image_url: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop",
     variants: [
       {
         id: "var-01",
@@ -56,21 +61,7 @@ const INITIAL_PRODUCTS = [
         in_stock: true,
         slabs: []
       }
-    ],
-    purity_certificate: {
-      lab_name: "Rajasthan State Food Testing Laboratory (FSSAI Reg # 1001)",
-      report_no: "LAB-RJ-2026-ATT-0491",
-      report_url: "https://example.com/reports/atta_sharbati_purity.pdf",
-      tested_on: "2026-10-06",
-      parameters: {
-        "moisture_pct": 10.4,
-        "foreign_matter_pct": 0.01,
-        "gluten_pct": 11.2,
-        "pesticide_residue": "NOT DETECTED",
-        "adulteration": "NIL"
-      },
-      result: "COMPLIANT_PURE"
-    }
+    ]
   },
   {
     id: "prod-02",
@@ -86,6 +77,7 @@ const INITIAL_PRODUCTS = [
     description: "Naturally aged 2-year royal steam basmati with exceptional aroma. Elongates 2.5x without clumping. Ideal for dum biryanis and pulao.",
     shelf_life_days: 720,
     is_perishable: false,
+    image_url: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&auto=format&fit=crop",
     variants: [
       {
         id: "var-03",
@@ -102,20 +94,7 @@ const INITIAL_PRODUCTS = [
           { min_qty: 16, max_qty: 100, slab_price: 2250 }
         ]
       }
-    ],
-    purity_certificate: {
-      lab_name: "Agri Quality Testing Council (NABL Accredited)",
-      report_no: "LAB-HR-2026-RIC-8832",
-      report_url: "https://example.com/reports/basmati_1121_lab_report.pdf",
-      tested_on: "2026-08-16",
-      parameters: {
-        "grain_length_avg_mm": 8.38,
-        "moisture_pct": 11.8,
-        "purity_pct": 99.8,
-        "broken_grain_pct": 0.5
-      },
-      result: "COMPLIANT_PURE"
-    }
+    ]
   },
   {
     id: "prod-03",
@@ -128,9 +107,10 @@ const INITIAL_PRODUCTS = [
     gst_rate: 5.0,
     origin: "Jaipur Dairy Farm, Rajasthan",
     grade: "Full Cream Malai (50%+ Fat)",
-    description: "Freshly curdled buffalo milk paneer with ultra-soft texture. Delivered in temperature controlled refrigerated vans before 9 AM.",
+    description: "Freshly curdled buffalo milk paneer with ultra-soft texture. Delivered in temperature controlled refrigerated vans at 3.5°C before 9 AM.",
     shelf_life_days: 10,
     is_perishable: true,
+    image_url: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&auto=format&fit=crop",
     variants: [
       {
         id: "var-04",
@@ -156,9 +136,10 @@ const INITIAL_PRODUCTS = [
     gst_rate: 0.0,
     origin: "Gulbarga, Karnataka",
     grade: "Grade A Unpolished",
-    description: "Zero oil, water, or color polishing. High natural protein with authentic rich taste and fast cooking.",
+    description: "Zero oil, water, or color polishing. High natural protein with authentic rich taste and fast boiling time in commercial pressure steamers.",
     shelf_life_days: 180,
     is_perishable: false,
+    image_url: "https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?w=800&auto=format&fit=crop",
     variants: [
       {
         id: "var-05",
@@ -184,9 +165,10 @@ const INITIAL_PRODUCTS = [
     gst_rate: 12.0,
     origin: "Tharparkar Cows, Rajasthan",
     grade: "Pure Bilona Danedar",
-    description: "Prepared from curd using traditional wooden churn bilona process. Granular texture with rich earthy aroma.",
+    description: "Prepared from curd using traditional wooden churn bilona process. Granular golden texture with rich earthy aroma and zero synthetic adulteration.",
     shelf_life_days: 365,
     is_perishable: false,
+    image_url: "https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=800&auto=format&fit=crop",
     variants: [
       {
         id: "var-06",
@@ -210,6 +192,9 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showDashboard, setShowDashboard] = useState(false);
 
+  // Selected Product Modal state
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+
   // Cart state
   const [cartItems, setCartItems] = useState<any[]>([
     {
@@ -228,21 +213,10 @@ export default function Home() {
   ]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Lab Report Modal state
-  const [activeReport, setActiveReport] = useState<any>(null);
-  const [reportProductName, setReportProductName] = useState("");
-
-  const handleOpenReport = (report: any, name: string) => {
-    setActiveReport(report);
-    setReportProductName(name);
-  };
-
   const handleAddToCart = (variantId: string, qty: number) => {
-    // Find variant and product
     for (const p of INITIAL_PRODUCTS) {
       const v = p.variants.find((v) => v.id === variantId);
       if (v) {
-        // Calculate price based on slabs
         const matchingSlab = v.slabs.find((s) => qty >= s.min_qty && qty <= s.max_qty);
         const unit_price = matchingSlab ? matchingSlab.slab_price : v.base_price;
         const itemSub = unit_price * qty;
@@ -333,16 +307,16 @@ export default function Home() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50/50 flex flex-col font-sans">
-      {/* Dynamic Notice Announcement Bar */}
-      <div className="bg-amber-500 text-emerald-950 font-bold text-xs py-1.5 px-4 text-center border-b border-amber-600/30 flex items-center justify-center gap-2">
-        <span>🌾 Fresh Harvest Special: Direct Sharbati Atta & 1121 Basmati bulk discounts for registered restaurants!</span>
-        <span className="hidden sm:inline bg-emerald-900 text-amber-300 text-[10px] uppercase px-2 py-0.5 rounded-full">
+    <div className="min-h-screen bg-slate-50/60 flex flex-col font-sans">
+      {/* Top Notice Announcement Bar */}
+      <div className="bg-amber-400 text-emerald-950 font-bold text-xs py-2 px-4 text-center border-b border-amber-500/30 flex items-center justify-center gap-2">
+        <span>🌾 Fresh Harvest Direct: Sharbati Atta & 1121 Basmati bulk mandi discounts live for verified restaurants!</span>
+        <span className="hidden sm:inline bg-emerald-950 text-amber-300 text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full">
           Orders before 9 PM ship at 6 AM
         </span>
       </div>
 
-      {/* Navbar with Mode Switcher */}
+      {/* Navbar with Mode Switcher & Navigation Links */}
       <Navbar
         activeView={activeView}
         setActiveView={setActiveView}
@@ -363,123 +337,190 @@ export default function Home() {
       {activeView === "buyer" && (
         <main className="flex-1">
           {/* Hero Banner Section */}
-          <div className="bg-gradient-to-r from-emerald-950 via-emerald-900 to-amber-950 text-white py-12 px-4 sm:px-6 lg:px-8 border-b border-amber-500/20">
-            <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-              <div className="max-w-2xl space-y-4">
-                <div className="inline-flex items-center gap-2 bg-amber-400/10 border border-amber-400/30 rounded-full px-3 py-1 text-xs font-bold text-amber-300">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+          <div className="relative bg-gradient-to-r from-emerald-950 via-emerald-900 to-amber-950 text-white py-16 px-4 sm:px-6 lg:px-8 border-b border-amber-500/20 overflow-hidden">
+            {/* Background Texture elements */}
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
+            
+            <div className="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
+              <div className="max-w-2xl space-y-5">
+                <div className="inline-flex items-center gap-2 bg-amber-400/15 border border-amber-400/40 rounded-full px-4 py-1.5 text-xs font-bold text-amber-300">
+                  <ShieldCheck className="w-4 h-4 text-amber-400" />
                   No Outside Sellers &bull; 100% Owned Warehouse Stock
                 </div>
+
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-                  Pure Food Supplies For Restaurants & Caterers.
+                  Pure Raw Food Supplies For Restaurants & Commercial Kitchens.
                 </h1>
+
                 <p className="text-emerald-100 text-sm sm:text-base leading-relaxed font-normal">
-                  Order stone-ground Sharbati atta, aged basmati rice, unpolished dals, and fresh malai paneer directly from AapnoKhet. Lab tested batches with GST tax invoices.
+                  Order stone-ground chakki wheat flour, 2-year aged basmati rice, unpolished native dals, and temperature-controlled malai paneer. Direct warehouse dispatch with Net 15 credit terms and GST invoices.
                 </p>
+
                 <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <a
+                    href="#supplies"
+                    className="bg-amber-400 hover:bg-amber-300 text-emerald-950 font-black text-xs uppercase tracking-wider py-3.5 px-6 rounded-2xl shadow-xl transition cursor-pointer flex items-center gap-2"
+                  >
+                    <span>Browse Raw Supplies</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+
                   <button
                     onClick={() => setShowDashboard(!showDashboard)}
-                    className="bg-amber-500 hover:bg-amber-400 text-emerald-950 font-black text-xs uppercase tracking-wider py-3 px-5 rounded-xl shadow-lg transition cursor-pointer"
+                    className="bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold text-xs uppercase tracking-wider py-3.5 px-5 rounded-2xl backdrop-blur-xs transition cursor-pointer"
                   >
-                    {showDashboard ? "Browse Catalog" : "My Orders & Credit Ledger"}
+                    {showDashboard ? "Close Dashboard" : "My Orders & Credit Ledger"}
                   </button>
-                  <div className="flex items-center gap-2 text-xs text-emerald-200">
+                </div>
+
+                {/* Trust Badges */}
+                <div className="flex items-center gap-4 pt-2 text-xs text-emerald-200">
+                  <div className="flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4 text-amber-400" />
-                    <span>Net 15 Credit Terms Active</span>
+                    <span>Net 15 Approved Credit</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4 text-amber-400" />
+                    <span>Next Morning 6 AM Slot</span>
                   </div>
                 </div>
               </div>
 
-              {/* Quick USP Card */}
-              <div className="w-full md:w-80 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-white space-y-3">
-                <h4 className="text-xs font-black uppercase tracking-wider text-amber-300">
-                  AapnoKhet Trust Standards
-                </h4>
-                <div className="text-xs space-y-2 text-emerald-100">
-                  <p className="flex items-start gap-2">
-                    <span className="text-amber-300 font-bold">✓</span>
-                    <span><strong>FEFO Allocation:</strong> Freshest batches shipped first with live batch expiry dates.</span>
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <span className="text-amber-300 font-bold">✓</span>
-                    <span><strong>Lab Reports:</strong> Download NABL/FSSAI testing certificates per SKU.</span>
-                  </p>
-                  <p className="flex items-start gap-2">
-                    <span className="text-amber-300 font-bold">✓</span>
-                    <span><strong>Refrigerated Fleet:</strong> Dairy kept below 4°C in monitored cold-chain vans.</span>
-                  </p>
+              {/* Right Hero Feature Card */}
+              <div className="w-full lg:w-96 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-6 text-white space-y-4 shadow-2xl">
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <span className="text-xs font-black uppercase tracking-wider text-amber-300">
+                    AapnoKhet Core Standards
+                  </span>
+                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold">
+                    Direct Mandi
+                  </span>
+                </div>
+
+                <div className="text-xs space-y-3 text-emerald-100">
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-amber-400 font-bold text-sm">🌾</span>
+                    <div>
+                      <strong className="text-white block">Stone-Ground Milling:</strong>
+                      <span>Milled fresh in our central Jaipur agro park chakki to keep natural wheat germ intact.</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-amber-400 font-bold text-sm">❄️</span>
+                    <div>
+                      <strong className="text-white block">Cold-Chain Fleet:</strong>
+                      <span>Fresh paneer transported strictly in refrigerated vans at 3.5°C directly to kitchen docks.</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <span className="text-amber-400 font-bold text-sm">📄</span>
+                    <div>
+                      <strong className="text-white block">Automated GST Invoicing:</strong>
+                      <span>Sequential tax invoices, HSN-wise rate split, and monthly GSTR export summaries.</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div id="supplies" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             {/* Buyer Account Dashboard (if toggled) */}
             {showDashboard && (
               <BuyerDashboard onReorder={handleReorder} />
             )}
 
-            {/* Category Filter Pills & Search */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-              {/* Category Pills */}
-              <div className="flex overflow-x-auto gap-2 pb-1 no-scrollbar">
-                {[
-                  { slug: "all", label: "All Supplies", icon: "🌾" },
-                  { slug: "flour", label: "Wheat & Flours", icon: "🍞" },
-                  { slug: "rice", label: "Rice & Grains", icon: "🍚" },
-                  { slug: "pulses", label: "Pulses & Dals", icon: "🥣" },
-                  { slug: "dairy", label: "Pure Dairy & Ghee", icon: "🧈" },
-                ].map((cat) => (
-                  <button
-                    key={cat.slug}
-                    onClick={() => setActiveCategory(cat.slug)}
-                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer border ${
-                      activeCategory === cat.slug
-                        ? "bg-emerald-800 text-white border-emerald-900 shadow-md"
-                        : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
-                    }`}
-                  >
-                    <span>{cat.icon}</span>
-                    <span>{cat.label}</span>
-                  </button>
-                ))}
+            {/* Section Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+              <div>
+                <span className="text-xs font-black uppercase tracking-wider text-amber-700 bg-amber-100 px-2.5 py-1 rounded-md">
+                  Wholesale Kitchen Supplies
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight">
+                  Commercial Raw Materials Catalog
+                </h2>
+                <p className="text-xs text-slate-500 mt-1">
+                  Click any product to inspect specifications, bulk slabs, and available pack sizes.
+                </p>
               </div>
 
               {/* Search Bar */}
-              <div className="relative w-full md:w-72">
+              <div className="relative w-full md:w-80">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search atta, rice, dals, paneer..."
+                  placeholder="Search atta, basmati, dals, paneer..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full text-xs font-medium pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-emerald-800"
+                  className="w-full text-xs font-medium pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-800 shadow-xs"
                 />
               </div>
             </div>
 
+            {/* Category Filter Pills */}
+            <div className="flex overflow-x-auto gap-2.5 pb-2 mb-8 no-scrollbar">
+              {[
+                { slug: "all", label: "All Supplies", icon: "🌾" },
+                { slug: "flour", label: "Wheat & Flours", icon: "🍞" },
+                { slug: "rice", label: "Rice & Grains", icon: "🍚" },
+                { slug: "pulses", label: "Pulses & Dals", icon: "🥣" },
+                { slug: "dairy", label: "Pure Dairy & Ghee", icon: "🧈" },
+              ].map((cat) => (
+                <button
+                  key={cat.slug}
+                  onClick={() => setActiveCategory(cat.slug)}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer border ${
+                    activeCategory === cat.slug
+                      ? "bg-emerald-900 text-white border-emerald-950 shadow-md"
+                      : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
+                  }`}
+                >
+                  <span className="text-sm">{cat.icon}</span>
+                  <span>{cat.label}</span>
+                </button>
+              ))}
+            </div>
+
             {/* Products Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
               {filteredProducts.map((p) => (
                 <ProductCard
                   key={p.id}
                   product={p}
                   onAddToCart={handleAddToCart}
-                  onOpenReport={handleOpenReport}
+                  onSelectProduct={(prod) => setSelectedProduct(prod)}
                   lang={lang}
                 />
               ))}
             </div>
           </div>
+
+          {/* Section: Instagram Reels / Videos */}
+          <div id="reels">
+            <InstagramReelsSection />
+          </div>
+
+          {/* Section: Testimonials & Chef Reviews */}
+          <div id="testimonials">
+            <TestimonialsSection />
+          </div>
+
+          {/* Section: About Us & Our Purity Story */}
+          <div id="about-us">
+            <AboutUsSection />
+          </div>
         </main>
       )}
 
-      {/* Lab Report Inspection Modal */}
-      <LabReportModal
-        isOpen={Boolean(activeReport)}
-        onClose={() => setActiveReport(null)}
-        report={activeReport}
-        productName={reportProductName}
+      {/* Product Detail Modal (On-Click Product Dialog) */}
+      <ProductDetailModal
+        product={selectedProduct}
+        isOpen={Boolean(selectedProduct)}
+        onClose={() => setSelectedProduct(null)}
+        onAddToCart={handleAddToCart}
+        lang={lang}
       />
 
       {/* Slide-over Cart Drawer */}
@@ -495,55 +536,68 @@ export default function Home() {
       />
 
       {/* Footer */}
-      <footer className="bg-emerald-950 text-white pt-12 pb-6 border-t border-amber-500/20 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-emerald-900 text-xs">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🌾</span>
-              <span className="text-xl font-black text-white">AapnoKhet</span>
+      <footer className="bg-emerald-950 text-white pt-16 pb-8 border-t border-amber-500/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-emerald-900 text-xs">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2.5">
+              <span className="text-3xl">🌾</span>
+              <div>
+                <span className="text-2xl font-black text-white">AapnoKhet</span>
+                <span className="text-[10px] text-amber-400 block font-bold uppercase tracking-wider">
+                  Pure Food Direct Supply
+                </span>
+              </div>
             </div>
-            <p className="text-emerald-300 leading-relaxed">
-              Pure Food Supply Chain B2B E-Commerce Platform. Delivering unadulterated wheat flour, aged rice, pulses, and cold-chain dairy to commercial kitchens.
+            <p className="text-emerald-300 leading-relaxed font-normal">
+              Direct supply of unadulterated Sharbati wheat flour, 2-year aged Basmati rice, unpolished pulses, and cold-chain dairy to restaurants, hotels, and cloud kitchens.
             </p>
-            <p className="text-amber-400 font-bold">FSSAI Licence # 12226999000845</p>
+            <div className="p-3 bg-emerald-900/50 rounded-xl border border-emerald-800 text-amber-300 font-bold">
+              FSSAI Central Licence # 12226999000845
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <h4 className="font-bold text-white uppercase tracking-wider">Quick Navigation</h4>
-            <ul className="space-y-1.5 text-emerald-300">
-              <li><a href="#" className="hover:text-amber-300">Sharbati Chakki Atta</a></li>
-              <li><a href="#" className="hover:text-amber-300">1121 Steam Basmati Rice</a></li>
-              <li><a href="#" className="hover:text-amber-300">Fresh Malai Paneer</a></li>
-              <li><a href="#" className="hover:text-amber-300">Bilona Pure Cow Ghee</a></li>
+          <div className="space-y-3">
+            <h4 className="font-bold text-white uppercase tracking-wider text-sm">Commercial Supplies</h4>
+            <ul className="space-y-2 text-emerald-300">
+              <li><a href="#supplies" className="hover:text-amber-300 transition">Stone-Ground Sharbati Atta (50kg)</a></li>
+              <li><a href="#supplies" className="hover:text-amber-300 transition">1121 Royal Steam Basmati Rice (25kg)</a></li>
+              <li><a href="#supplies" className="hover:text-amber-300 transition">Fresh Malai Paneer (Cold Chain 5kg)</a></li>
+              <li><a href="#supplies" className="hover:text-amber-300 transition">Unpolished Desi Toor Dal (30kg)</a></li>
+              <li><a href="#supplies" className="hover:text-amber-300 transition">Bilona Pure Cow Ghee (15kg Tin)</a></li>
             </ul>
           </div>
 
-          <div className="space-y-2">
-            <h4 className="font-bold text-white uppercase tracking-wider">B2B Standards</h4>
-            <ul className="space-y-1.5 text-emerald-300">
-              <li>FEFO Batch Traceability</li>
-              <li>GST Tax Invoices & E-Way Bills</li>
-              <li>Net 15 Approved Credit Lines</li>
-              <li>Zero Marketplace / Direct Owned Stock</li>
+          <div className="space-y-3">
+            <h4 className="font-bold text-white uppercase tracking-wider text-sm">Platform & Trust</h4>
+            <ul className="space-y-2 text-emerald-300">
+              <li><a href="#about-us" className="hover:text-amber-300 transition">About Our Direct Supply Model</a></li>
+              <li><a href="#reels" className="hover:text-amber-300 transition">Kitchen Prep Stories & Reels</a></li>
+              <li><a href="#testimonials" className="hover:text-amber-300 transition">Chef & Restaurant Reviews</a></li>
+              <li><span className="text-slate-400">FEFO Expiry-First Warehouse Protocol</span></li>
+              <li><span className="text-slate-400">Net 15 Approved Credit Accounts</span></li>
             </ul>
           </div>
 
-          <div className="space-y-2">
-            <h4 className="font-bold text-white uppercase tracking-wider">Central Depot Contact</h4>
-            <p className="text-emerald-300 flex items-start gap-2">
+          <div className="space-y-3">
+            <h4 className="font-bold text-white uppercase tracking-wider text-sm">Depot & Orders Desk</h4>
+            <p className="text-emerald-300 flex items-start gap-2.5 leading-relaxed">
               <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <span>Plot 42, Agro Food Park, RIICO Industrial Area, Mansarovar, Jaipur - 302020</span>
             </p>
             <p className="text-emerald-300 flex items-center gap-2">
               <Phone className="w-4 h-4 text-amber-400" />
-              <span>+91 98290 12345 (Orders Desk)</span>
+              <span className="font-mono font-bold">+91 98290 12345 (Orders Desk)</span>
+            </p>
+            <p className="text-emerald-300 flex items-center gap-2">
+              <Mail className="w-4 h-4 text-amber-400" />
+              <span>orders@aapnokhet.com</span>
             </p>
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex flex-col sm:flex-row justify-between items-center text-[11px] text-emerald-400 gap-2">
           <p>&copy; 2026 AapnoKhet Pure Food Supply Chain Pvt Ltd. All rights reserved.</p>
-          <p>Compliant with FSSAI, GST & India DPDP Act 2023.</p>
+          <p>GST & FSSAI Compliant B2B Direct Food Supply Chain Platform.</p>
         </div>
       </footer>
     </div>

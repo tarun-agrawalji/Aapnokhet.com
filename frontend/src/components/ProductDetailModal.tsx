@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   X, ShoppingBag, Plus, Minus, Check, Sparkles, 
   MapPin, ShieldCheck, Clock, Box, Building2, Star 
@@ -52,11 +52,29 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 }) => {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [added, setAdded] = useState(false);
+  const [qty, setQty] = useState(1);
+
+  // Sync initial MOQ when product or selectedVariant changes
+  useEffect(() => {
+    if (product && product.variants && product.variants.length > 0) {
+      const currentVar = product.variants[selectedVariantIndex] || product.variants[0];
+      if (currentVar) {
+        setQty(currentVar.moq || 1);
+      }
+    }
+  }, [product, selectedVariantIndex]);
+
+  // Reset variant index when product changes or opens
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedVariantIndex(0);
+      setAdded(false);
+    }
+  }, [isOpen, product]);
 
   if (!isOpen || !product) return null;
 
   const selectedVariant = product.variants[selectedVariantIndex] || product.variants[0];
-  const [qty, setQty] = useState(selectedVariant?.moq || 1);
 
   const handleVariantChange = (idx: number) => {
     setSelectedVariantIndex(idx);
