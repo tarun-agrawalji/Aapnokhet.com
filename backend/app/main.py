@@ -12,9 +12,7 @@ from app.api.v1 import (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure upload directory exists
-    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-    # Create all DB tables asynchronously
+    # Create all DB tables asynchronously (no-op when they already exist)
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
@@ -29,16 +27,17 @@ app = FastAPI(
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Allow all origins for dev
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Static files for documents, images, and reports
-if not os.path.exists("./uploads"):
-    os.makedirs("./uploads", exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="./uploads"), name="uploads")
+# Locally uploaded documents. Vercel's filesystem is read-only, so this is skipped there;
+# move uploads to Vercel Blob before relying on them in production.
+if settings.SERVE_LOCAL_UPLOADS:
+    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+    app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
 
 # Include Routers
 app.include_router(auth.router, prefix=settings.API_V1_STR)

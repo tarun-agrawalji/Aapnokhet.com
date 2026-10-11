@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { useAuth } from "@/context/AuthContext";
@@ -18,16 +19,26 @@ const LINKS = [
   { href: "/#quality", label: "Quality" },
 ];
 
-export function Wordmark({ inverted = false }: { inverted?: boolean }) {
+/* The AapnoKhet logo. "wordmark" for tight horizontal spots, "full" adds the sprout above it. */
+export function Wordmark({
+  variant = "wordmark",
+  inverted = false,
+  className = "",
+}: {
+  variant?: "wordmark" | "full";
+  inverted?: boolean;
+  className?: string;
+}) {
+  const full = variant === "full";
   return (
-    <span className="flex items-baseline gap-2">
-      <span className={`font-display text-[22px] leading-none tracking-[-0.01em] ${inverted ? "text-white" : "text-ink"}`}>
-        AapnoKhet
-      </span>
-      <span lang="hi" className={`font-hindi hidden text-[13px] leading-none min-[360px]:inline ${inverted ? "text-white/55" : "text-muted"}`}>
-        आपणो खेत
-      </span>
-    </span>
+    <Image
+      src={full ? "/logo.png" : "/logo-wordmark.png"}
+      alt="AapnoKhet"
+      width={full ? 1566 : 1558}
+      height={full ? 923 : 405}
+      priority
+      className={`${full ? "h-24" : "h-10 sm:h-12"} w-auto ${inverted ? "invert" : ""} ${className}`}
+    />
   );
 }
 

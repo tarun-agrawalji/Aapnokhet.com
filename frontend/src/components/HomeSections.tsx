@@ -149,7 +149,7 @@ export function SiteFooter() {
     <footer className="border-t border-line bg-wash">
       <div className="mx-auto grid max-w-[1240px] gap-12 px-4 py-16 text-[14px] sm:px-6 md:grid-cols-12 lg:px-10">
         <div className="md:col-span-5">
-          <Wordmark />
+          <Wordmark variant="full" className="h-20" />
           <p className="mt-4 max-w-[40ch] leading-relaxed text-ink-2">
             Atta, rice, dal and dairy for restaurants, hotels and caterers in Jaipur, sold and delivered from our own warehouse.
           </p>

@@ -126,7 +126,7 @@ function LoginForm() {
   if (isAuthenticated && user) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
-        <Wordmark />
+        <Wordmark variant="full" />
         <h1 className="font-display mt-10 text-[36px] leading-tight">You are signed in.</h1>
         <p className="mt-3 text-[16px] text-ink-2">
           Signed in as {user.name}, {user.company_name}.

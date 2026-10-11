@@ -26,7 +26,7 @@ class Company(Base):
     business_type = Column(String(50), default="Restaurant") # Hotel, Caterer, Cloud Kitchen
     kyb_status = Column(String(30), default="PENDING") # PENDING, APPROVED, REJECTED
     kyb_rejection_reason = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     users = relationship("User", back_populates="company")
     addresses = relationship("Address", back_populates="company")
@@ -49,8 +49,8 @@ class User(Base):
     mfa_secret = Column(String(100), nullable=True)
     spend_limit = Column(Float, default=50000.0) # for Buyer Staff sub-users
     status = Column(String(30), default="ACTIVE") # ACTIVE, DISABLED
-    last_login = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=now_utc)
+    last_login = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     company = relationship("Company", back_populates="users")
     orders = relationship("Order", back_populates="placed_by_user")
@@ -84,8 +84,8 @@ class KybDocument(Base):
     file_url = Column(String(500), nullable=False)
     status = Column(String(30), default="PENDING") # PENDING, VERIFIED, REJECTED
     reviewed_by = Column(String(100), nullable=True)
-    reviewed_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=now_utc)
+    reviewed_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     company = relationship("Company", back_populates="documents")
 
@@ -135,7 +135,7 @@ class Product(Base):
     shelf_life_days = Column(Integer, default=180)
     is_perishable = Column(Boolean, default=False)
     active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     category = relationship("Category", back_populates="products")
     variants = relationship("ProductVariant", back_populates="product", cascade="all, delete-orphan")
@@ -166,7 +166,7 @@ class PriceSlab(Base):
     min_qty = Column(Integer, nullable=False)
     max_qty = Column(Integer, nullable=False)
     slab_price = Column(Float, nullable=False) # INR
-    effective_from = Column(DateTime, default=now_utc)
+    effective_from = Column(DateTime(timezone=True), default=now_utc)
     
     variant = relationship("ProductVariant", back_populates="slabs")
 
@@ -177,8 +177,8 @@ class CustomerPrice(Base):
     company_id = Column(String(36), ForeignKey("companies.id"), nullable=False)
     variant_id = Column(String(36), ForeignKey("product_variants.id"), nullable=False)
     custom_price = Column(Float, nullable=False)
-    valid_till = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=now_utc)
+    valid_till = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
 
 class Warehouse(Base):
     __tablename__ = "warehouses"
@@ -205,7 +205,7 @@ class Batch(Base):
     qty_available = Column(Integer, default=0)
     qty_reserved = Column(Integer, default=0)
     qc_status = Column(String(30), default="PASSED") # PENDING, PASSED, FAILED
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     variant = relationship("ProductVariant", back_populates="batches")
     warehouse = relationship("Warehouse", back_populates="batches")
@@ -237,7 +237,7 @@ class StockMovement(Base):
     qty = Column(Integer, nullable=False)
     reason = Column(String(255), nullable=True)
     done_by_user_id = Column(String(36), nullable=True)
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     batch = relationship("Batch", back_populates="movements")
 
@@ -249,7 +249,7 @@ class StockReservation(Base):
     batch_id = Column(String(36), ForeignKey("batches.id"), nullable=False)
     qty = Column(Integer, nullable=False)
     status = Column(String(30), default="ACTIVE") # ACTIVE, CONVERTED, RELEASED
-    expires_at = Column(DateTime, nullable=False) # 30 min TTL
+    expires_at = Column(DateTime(timezone=True), nullable=False) # 30 min TTL
 
 # ----------------- CART & ORDERS -----------------
 class Cart(Base):
@@ -257,7 +257,7 @@ class Cart(Base):
     
     id = Column(String(36), primary_key=True, default=gen_uuid)
     user_id = Column(String(36), ForeignKey("users.id"), unique=True, nullable=False)
-    updated_at = Column(DateTime, default=now_utc)
+    updated_at = Column(DateTime(timezone=True), default=now_utc)
     
     user = relationship("User", back_populates="cart")
     items = relationship("CartItem", back_populates="cart", cascade="all, delete-orphan")
@@ -291,7 +291,7 @@ class Order(Base):
     delivery_date = Column(Date, nullable=False)
     delivery_slot = Column(String(100), default="Morning 6 AM - 10 AM")
     special_notes = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     company = relationship("Company", back_populates="orders")
     placed_by_user = relationship("User", back_populates="orders")
@@ -326,7 +326,7 @@ class OrderStatusHistory(Base):
     status = Column(String(50), nullable=False)
     notes = Column(Text, nullable=True)
     changed_by = Column(String(100), nullable=True)
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     order = relationship("Order", back_populates="status_history")
 
@@ -340,7 +340,7 @@ class Payment(Base):
     mode = Column(String(50), default="UPI")
     amount = Column(Float, nullable=False)
     status = Column(String(30), default="SUCCESS")
-    paid_at = Column(DateTime, default=now_utc)
+    paid_at = Column(DateTime(timezone=True), default=now_utc)
 
 class Invoice(Base):
     __tablename__ = "invoices"
@@ -358,7 +358,7 @@ class Invoice(Base):
     due_date = Column(Date, nullable=False)
     pdf_url = Column(String(500), nullable=True)
     status = Column(String(30), default="ISSUED") # ISSUED, PAID, PARTIAL, CANCELLED
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     order = relationship("Order", back_populates="invoice")
     credit_notes = relationship("CreditNote", back_populates="invoice")
@@ -371,7 +371,7 @@ class CreditNote(Base):
     credit_note_no = Column(String(50), unique=True, nullable=False)
     amount = Column(Float, nullable=False)
     reason = Column(String(255), nullable=False)
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     invoice = relationship("Invoice", back_populates="credit_notes")
 
@@ -387,7 +387,7 @@ class LedgerEntry(Base):
     ref_type = Column(String(50), nullable=False) # INVOICE, PAYMENT, CREDIT_NOTE
     ref_id = Column(String(100), nullable=False)
     description = Column(String(255), nullable=False)
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     company = relationship("Company", back_populates="ledger_entries")
 
@@ -419,10 +419,10 @@ class Delivery(Base):
     vehicle_id = Column(String(36), ForeignKey("vehicles.id"), nullable=True)
     driver_id = Column(String(36), ForeignKey("drivers.id"), nullable=True)
     status = Column(String(50), default="ASSIGNED") # ASSIGNED, PACKED, DISPATCHED, OUT_FOR_DELIVERY, DELIVERED, FAILED
-    eta = Column(DateTime, nullable=True)
+    eta = Column(DateTime(timezone=True), nullable=True)
     run_sheet_no = Column(String(50), nullable=True)
     eway_bill_no = Column(String(50), nullable=True)
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
     
     order = relationship("Order", back_populates="delivery")
     vehicle = relationship("Vehicle")
@@ -439,7 +439,7 @@ class ProofOfDelivery(Base):
     photo_url = Column(String(500), nullable=True)
     signature_url = Column(String(500), nullable=True)
     receiver_name = Column(String(150), nullable=True)
-    verified_at = Column(DateTime, nullable=True)
+    verified_at = Column(DateTime(timezone=True), nullable=True)
     lat = Column(Float, nullable=True)
     lng = Column(Float, nullable=True)
     
@@ -456,7 +456,7 @@ class Ticket(Base):
     subject = Column(String(255), nullable=False)
     status = Column(String(30), default="OPEN") # OPEN, IN_REVIEW, RESOLVED, CLOSED
     priority = Column(String(20), default="HIGH") # LOW, MEDIUM, HIGH, URGENT
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
 
 class TicketMessage(Base):
     __tablename__ = "ticket_messages"
@@ -467,7 +467,7 @@ class TicketMessage(Base):
     sender_name = Column(String(100), nullable=False)
     body = Column(Text, nullable=False)
     attachment_url = Column(String(500), nullable=True)
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
 
 # ----------------- ADMIN CMS, SETTINGS & AI HELPER -----------------
 class Page(Base):
@@ -480,7 +480,7 @@ class Page(Base):
     seo_title = Column(String(200), nullable=True)
     seo_description = Column(String(300), nullable=True)
     status = Column(String(30), default="LIVE") # DRAFT, IN_REVIEW, LIVE, HIDDEN
-    updated_at = Column(DateTime, default=now_utc)
+    updated_at = Column(DateTime(timezone=True), default=now_utc)
 
 class PageSection(Base):
     __tablename__ = "page_sections"
@@ -502,8 +502,8 @@ class Banner(Base):
     image_url = Column(String(500), nullable=False)
     mobile_image_url = Column(String(500), nullable=True)
     link_url = Column(String(500), default="/catalog")
-    starts_at = Column(DateTime, nullable=True)
-    ends_at = Column(DateTime, nullable=True)
+    starts_at = Column(DateTime(timezone=True), nullable=True)
+    ends_at = Column(DateTime(timezone=True), nullable=True)
     visible = Column(Boolean, default=True)
     sort_order = Column(Integer, default=0)
 
@@ -535,7 +535,7 @@ class Setting(Base):
     key = Column(String(100), primary_key=True)
     value = Column(Text, nullable=False)
     description = Column(String(255), nullable=True)
-    updated_at = Column(DateTime, default=now_utc)
+    updated_at = Column(DateTime(timezone=True), default=now_utc)
 
 class AiRequest(Base):
     __tablename__ = "ai_requests"
@@ -547,7 +547,7 @@ class AiRequest(Base):
     input_facts = Column(Text, nullable=False)
     generated_text = Column(Text, nullable=False)
     status = Column(String(30), default="DRAFT") # DRAFT, APPROVED, PUBLISHED
-    created_at = Column(DateTime, default=now_utc)
+    created_at = Column(DateTime(timezone=True), default=now_utc)
 
 class AuditLog(Base):
     __tablename__ = "audit_logs"
@@ -561,4 +561,4 @@ class AuditLog(Base):
     before_state = Column(JSON, nullable=True)
     after_state = Column(JSON, nullable=True)
     ip_address = Column(String(50), nullable=True)
-    timestamp = Column(DateTime, default=now_utc)
+    timestamp = Column(DateTime(timezone=True), default=now_utc)
