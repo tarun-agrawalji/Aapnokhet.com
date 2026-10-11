@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { 
   ShoppingBag, ShieldCheck, Truck, Settings, User, 
-  MapPin, Globe, Sparkles, Building2, Store, Video, 
+  MapPin, Sparkles, Building2, Store, Video, 
   HeartHandshake, Info, LogIn, LogOut, ChevronDown, 
   CheckCircle2, Clock, FileText 
 } from "lucide-react";
@@ -14,8 +14,8 @@ import {
 interface NavbarProps {
   cartCount: number;
   openCart: () => void;
-  lang: "EN" | "HI";
-  setLang: (lang: "EN" | "HI") => void;
+  lang?: "EN" | "HI";
+  setLang?: (lang: "EN" | "HI") => void;
   onToggleDashboard?: () => void;
   // Optional legacy props for backwards compatibility
   activeView?: "buyer" | "admin" | "driver";
@@ -89,16 +89,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right side actions */}
         <div className="flex items-center space-x-3">
-          {/* Language Switcher */}
-          <button
-            onClick={() => setLang(lang === "EN" ? "HI" : "EN")}
-            className="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold px-3 py-2 rounded-xl transition cursor-pointer border border-slate-200"
-            title="Toggle Language"
-          >
-            <Globe className="w-3.5 h-3.5 text-emerald-800" />
-            <span>{lang === "EN" ? "हिन्दी" : "English"}</span>
-          </button>
-
           {/* Cart Button */}
           <button
             onClick={openCart}

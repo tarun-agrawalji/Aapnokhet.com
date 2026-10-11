@@ -29,7 +29,6 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
     grandTotal
   } = useCart();
 
-  const [lang, setLang] = useState<"EN" | "HI">("EN");
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [qty, setQty] = useState(product.variants[0]?.moq || 1);
@@ -89,12 +88,10 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
 
   return (
     <div className="min-h-screen bg-slate-50/70 flex flex-col font-sans">
-      {/* Navbar with language and cart controls */}
+      {/* Navbar with brand navigation and cart controls */}
       <Navbar
         cartCount={cartItems.length}
         openCart={() => setIsCartOpen(true)}
-        lang={lang}
-        setLang={setLang}
       />
 
       <main className="flex-1 pb-20">
@@ -112,7 +109,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               </Link>
               <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
               <span className="font-bold text-slate-900 truncate max-w-[240px] sm:max-w-none">
-                {lang === "HI" && product.name_hindi ? product.name_hindi : product.name}
+                {product.name}
               </span>
             </div>
 
@@ -245,7 +242,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
 
                 <div>
                   <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-tight">
-                    {lang === "HI" && product.name_hindi ? product.name_hindi : product.name}
+                    {product.name}
                   </h1>
                   <p className="text-xs text-emerald-800 font-bold uppercase tracking-wider mt-1">
                     Direct Commercial Supply By {product.brand}
@@ -525,7 +522,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                             <span>{rel.origin}</span>
                           </div>
                           <h4 className="text-sm font-black text-slate-900 group-hover:text-emerald-900 transition leading-snug">
-                            {lang === "HI" && rel.name_hindi ? rel.name_hindi : rel.name}
+                            {rel.name}
                           </h4>
                           <p className="text-xs text-slate-500 line-clamp-2 mt-1">
                             {rel.description}

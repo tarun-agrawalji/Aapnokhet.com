@@ -3,14 +3,11 @@
 import React, { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { ProductCard } from "@/components/ProductCard";
-import { ProductDetailModal } from "@/components/ProductDetailModal";
 import { InstagramReelsSection } from "@/components/InstagramReelsSection";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
 import { AboutUsSection } from "@/components/AboutUsSection";
 import { CartDrawer } from "@/components/CartDrawer";
 import { BuyerDashboard } from "@/components/BuyerDashboard";
-import { AdminConsole } from "@/components/AdminConsole";
-import { DriverPwa } from "@/components/DriverPwa";
 import { 
   ShieldCheck, Truck, Sparkles, Search, 
   CheckCircle2, ChevronRight, Phone, Mail, MapPin, 
@@ -21,13 +18,9 @@ import { PRODUCTS, Product } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 
 export default function Home() {
-  const [lang, setLang] = useState<"EN" | "HI">("EN");
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [showDashboard, setShowDashboard] = useState(false);
-
-  // Selected Product Modal state
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
   // Cart state from shared context
   const {
@@ -72,8 +65,6 @@ export default function Home() {
       <Navbar
         cartCount={cartItems.length}
         openCart={() => setIsCartOpen(true)}
-        lang={lang}
-        setLang={setLang}
         onToggleDashboard={() => setShowDashboard(!showDashboard)}
       />
 
@@ -233,8 +224,6 @@ export default function Home() {
                   key={p.id}
                   product={p}
                   onAddToCart={handleAddToCart}
-                  onSelectProduct={(prod) => setSelectedProduct(prod)}
-                  lang={lang}
                 />
               ))}
             </div>
@@ -255,15 +244,6 @@ export default function Home() {
             <AboutUsSection />
           </div>
         </main>
-
-      {/* Product Detail Modal (On-Click Product Dialog) */}
-      <ProductDetailModal
-        product={selectedProduct}
-        isOpen={Boolean(selectedProduct)}
-        onClose={() => setSelectedProduct(null)}
-        onAddToCart={handleAddToCart}
-        lang={lang}
-      />
 
       {/* Slide-over Cart Drawer */}
       <CartDrawer

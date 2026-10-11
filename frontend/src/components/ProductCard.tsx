@@ -40,15 +40,11 @@ interface Product {
 interface ProductCardProps {
   product: Product;
   onAddToCart: (variantId: string, qty: number) => void;
-  onSelectProduct?: (product: Product) => void;
-  lang: "EN" | "HI";
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
-  onAddToCart,
-  onSelectProduct,
-  lang
+  onAddToCart
 }) => {
   const router = useRouter();
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
@@ -89,9 +85,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const handleCardClick = () => {
     router.push(`/products/${product.slug}`);
-    if (onSelectProduct) {
-      onSelectProduct(product);
-    }
   };
 
   return (
@@ -109,7 +102,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
             <span className="text-white text-xs font-bold flex items-center gap-1.5">
-              <span>View Full Product Page & Slabs</span>
+              <span>View Product Details & Slabs</span>
               <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
             </span>
           </div>
@@ -137,7 +130,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
 
           <h3 className="text-base font-black text-slate-900 group-hover:text-emerald-900 transition leading-snug">
-            {lang === "HI" && product.name_hindi ? product.name_hindi : product.name}
+            {product.name}
           </h3>
 
           <p className="text-xs text-slate-500 line-clamp-2 mt-1.5 font-normal leading-relaxed">
