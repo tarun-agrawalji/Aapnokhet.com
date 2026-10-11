@@ -62,11 +62,9 @@ export const PRODUCTS: Product[] = [
     full_description: "Our Chakki Fresh Sharbati Atta is procured directly from certified grain farmers across the fertile black soil belts of Sehore and Rajasthan. Milled using slow-speed, natural stone chakki grinders in our central Jaipur facility to avoid frictional heat damage, ensuring the wheat germ, natural endosperm oils, and essential bran fibers remain 100% intact. Ideal for high-output commercial tandoors, hotel banquet catering, and restaurant service counters.",
     shelf_life_days: 90,
     is_perishable: false,
-    image_url: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&auto=format&fit=crop",
+    image_url: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&auto=format&fit=crop",
     gallery: [
-      "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1549931319-a545dcf3bc73?w=1200&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&auto=format&fit=crop"
     ],
     specs: [
       { label: "Grain Type", value: "100% MP Golden Sharbati Wheat" },
@@ -201,8 +199,7 @@ export const PRODUCTS: Product[] = [
     is_perishable: true,
     image_url: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=1200&auto=format&fit=crop",
     gallery: [
-      "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=1200&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=1200&auto=format&fit=crop"
     ],
     specs: [
       { label: "Milk Source", value: "100% Pure Buffalo Full Cream Milk" },
@@ -258,9 +255,10 @@ export const PRODUCTS: Product[] = [
     full_description: "Direct procurement from Gulbarga, Karnataka's renowned GI pulse hub. Unlike regular market dals polished with mineral oil, water, and synthetic dyes to give superficial shine, our unpolished Toor Dal retains the outer mineral-rich layer. Cooks uniformly and quickly in commercial kitchen pressure boilers with rich, natural aroma and maximum protein yield.",
     shelf_life_days: 180,
     is_perishable: false,
-    image_url: "https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?w=1200&auto=format&fit=crop",
+    image_url: "https://images.unsplash.com/photo-1612869538502-b5baa439abd7?w=1200&auto=format&fit=crop",
     gallery: [
-      "https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?w=1200&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1612869538502-b5baa439abd7?w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1702041357314-db5826c96f04?w=1200&auto=format&fit=crop"
     ],
     specs: [
       { label: "Variety", value: "Desi Gulbarga Toor Dal (Pigeon Pea)" },
@@ -316,9 +314,10 @@ export const PRODUCTS: Product[] = [
     full_description: "Handcrafted using the ancestral Vedic bilona method from curdled indigenous cow milk across Rajasthan farms. The butter is clarified over slow wood-fire heat to yield rich, fragrant granular (danedar) golden ghee. Perfect for specialty royal gravies, traditional sweets, dal tadkas, and aromatic restaurant breads.",
     shelf_life_days: 365,
     is_perishable: false,
-    image_url: "https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=1200&auto=format&fit=crop",
+    image_url: "https://images.unsplash.com/photo-1601232265936-6da280cff563?w=1200&h=1500&auto=format&fit=crop&crop=bottom,left",
     gallery: [
-      "https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=1200&auto=format&fit=crop"
+      "https://images.unsplash.com/photo-1601232265936-6da280cff563?w=1200&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1702480249957-d28c32b06678?w=1200&auto=format&fit=crop"
     ],
     specs: [
       { label: "Extraction Process", value: "Traditional Makkhan Bilona Churning" },

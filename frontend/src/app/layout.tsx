@@ -1,24 +1,38 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Onest, Young_Serif, Tiro_Devanagari_Hindi } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata: Metadata = {
-  title: "AapnoKhet — Pure Food Supply Chain B2B E-Commerce Platform",
-  description: "Direct supply of pure, lab-tested Sharbati wheat flour, 1121 Basmati rice, pulses, and cold-chain dairy to restaurants, hotels, and cloud kitchens in India with GST invoicing and FEFO batch traceability.",
-};
 
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import { MotionProvider } from "@/components/MotionProvider";
+
+const onest = Onest({
+  variable: "--font-onest",
+  subsets: ["latin"],
+});
+
+const youngSerif = Young_Serif({
+  variable: "--font-young-serif",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const tiroDevanagari = Tiro_Devanagari_Hindi({
+  variable: "--font-tiro-devanagari",
+  subsets: ["devanagari", "latin"],
+  weight: "400",
+});
+
+export const metadata: Metadata = {
+  title: "AapnoKhet | Kitchen staples, direct from our warehouse",
+  description:
+    "Stone-milled atta, aged basmati, unpolished dals and cold-chain dairy for restaurants, hotels and caterers. Lab-tested batches, delivery by 6 AM, 15-day credit and GST invoices.",
+};
+
+export const viewport: Viewport = {
+  colorScheme: "only light",
+  themeColor: "#ffffff",
+};
 
 export default function RootLayout({
   children,
@@ -28,11 +42,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${onest.variable} ${youngSerif.variable} ${tiroDevanagari.variable} h-full`}
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <CartProvider>{children}</CartProvider>
+          <CartProvider>
+            <MotionProvider>{children}</MotionProvider>
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

@@ -1,268 +1,179 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { 
-  Plus, Minus, ShoppingBag, Sparkles, Clock, 
-  MapPin, Eye, CheckCircle2, ArrowRight 
-} from "lucide-react";
-
-interface Variant {
-  id: string;
-  sku: string;
-  pack_size: string;
-  unit: string;
-  base_price: number;
-  moq: number;
-  available_stock: number;
-  in_stock: boolean;
-  slabs: Array<{ min_qty: number; max_qty: number; slab_price: number }>;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  name_hindi?: string;
-  slug: string;
-  brand: string;
-  hsn_code: string;
-  gst_rate: number;
-  origin: string;
-  grade: string;
-  description: string;
-  shelf_life_days: number;
-  is_perishable: boolean;
-  image_url: string;
-  variants: Variant[];
-}
+import { AnimatePresence, motion } from "motion/react";
+import { Minus, Plus } from "lucide-react";
+import type { Product } from "@/data/products";
+import { inr, nextBetterSlab, unitLabel, unitPriceFor } from "@/lib/pricing";
 
 interface ProductCardProps {
   product: Product;
   onAddToCart: (variantId: string, qty: number) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
-  product,
-  onAddToCart
-}) => {
-  const router = useRouter();
-  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
-  const selectedVariant = product.variants[selectedVariantIndex] || product.variants[0];
-  const [qty, setQty] = useState(selectedVariant?.moq || 1);
+/* "Sharbati Whole Wheat Atta (Chakki Fresh)" -> ["Sharbati Whole Wheat Atta", "Chakki Fresh"] */
+export function splitName(name: string): [string, string | undefined] {
+  const m = name.match(/^(.*?)\s*\((.*)\)\s*$/);
+  return m ? [m[1], m[2]] : [name, undefined];
+}
+
+export function QtyStepper({
+  qty,
+  min,
+  onChange,
+  label,
+}: {
+  qty: number;
+  min: number;
+  onChange: (q: number) => void;
+  label: string;
+}) {
+  return (
+    <div className="flex h-11 items-center rounded-full border border-line">
+      <button
+        type="button"
+        onClick={() => onChange(Math.max(min, qty - 1))}
+        disabled={qty <= min}
+        aria-label={`Fewer ${label}`}
+        className="flex h-11 w-10 items-center justify-center rounded-l-full text-ink transition-colors hover:bg-wash disabled:text-line disabled:hover:bg-transparent"
+      >
+        <Minus className="h-3.5 w-3.5" strokeWidth={1.8} />
+      </button>
+      <span className="tabular w-8 text-center text-[15px]" aria-live="polite">
+        {qty}
+      </span>
+      <button
+        type="button"
+        onClick={() => onChange(qty + 1)}
+        aria-label={`More ${label}`}
+        className="flex h-11 w-10 items-center justify-center rounded-r-full text-ink transition-colors hover:bg-wash"
+      >
+        <Plus className="h-3.5 w-3.5" strokeWidth={1.8} />
+      </button>
+    </div>
+  );
+}
+
+export const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
+  const [variantIndex, setVariantIndex] = useState(0);
+  const variant = product.variants[variantIndex] ?? product.variants[0];
+  const [qty, setQty] = useState(variant?.moq || 1);
   const [added, setAdded] = useState(false);
 
-  // Sync qty with variant MOQ when changing pack size
-  const handleVariantChange = (index: number, e: React.MouseEvent) => {
-    e.stopPropagation(); // Avoid opening page on pill click
-    setSelectedVariantIndex(index);
-    const newVar = product.variants[index];
-    if (newVar && qty < newVar.moq) {
-      setQty(newVar.moq);
-    }
+  const [title, qualifier] = splitName(product.name);
+  const unitPrice = unitPriceFor(variant, qty);
+  const discounted = variant && unitPrice < variant.base_price;
+  const nextSlab = nextBetterSlab(variant, qty);
+  const href = `/products/${product.slug}`;
+
+  const selectVariant = (i: number) => {
+    setVariantIndex(i);
+    const v = product.variants[i];
+    if (v && qty < v.moq) setQty(v.moq);
   };
 
-  // Compute live price based on current quantity and bulk slabs
-  const getEffectiveUnitPrice = () => {
-    if (!selectedVariant) return 0;
-    const matchingSlab = selectedVariant.slabs.find(
-      (s) => qty >= s.min_qty && qty <= s.max_qty
-    );
-    return matchingSlab ? matchingSlab.slab_price : selectedVariant.base_price;
-  };
-
-  const effectiveUnitPrice = getEffectiveUnitPrice();
-  const totalPrice = effectiveUnitPrice * qty;
-  const isBulkDiscountApplied = selectedVariant && effectiveUnitPrice < selectedVariant.base_price;
-
-  const handleAdd = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!selectedVariant) return;
-    onAddToCart(selectedVariant.id, qty);
+  const add = () => {
+    if (!variant) return;
+    onAddToCart(variant.id, qty);
     setAdded(true);
-    setTimeout(() => setAdded(false), 1400);
-  };
-
-  const handleCardClick = () => {
-    router.push(`/products/${product.slug}`);
+    setTimeout(() => setAdded(false), 1600);
   };
 
   return (
-    <div
-      onClick={handleCardClick}
-      className="bg-white rounded-3xl border border-amber-100 hover:border-amber-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group cursor-pointer"
-    >
-      <div>
-        {/* Product Image Container with Badges */}
-        <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100">
-          <img
-            src={product.image_url}
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-            <span className="text-white text-xs font-bold flex items-center gap-1.5">
-              <span>View Product Details & Slabs</span>
-              <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
-            </span>
-          </div>
+    <article className="flex flex-col">
+      <Link href={href} className="block overflow-hidden rounded-lg bg-wash" tabIndex={-1} aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={product.image_url}
+          alt=""
+          loading="lazy"
+          className="aspect-[4/5] w-full object-cover transition-transform duration-700 ease-out hover:scale-[1.03]"
+        />
+      </Link>
 
-          {/* Badges Overlay */}
-          <div className="absolute top-3 left-3 flex flex-wrap gap-1.5">
-            <span className="text-[10px] font-black uppercase tracking-wider bg-emerald-950/85 backdrop-blur-xs text-white px-2.5 py-1 rounded-lg shadow-sm">
-              {product.grade}
-            </span>
-            {product.is_perishable && (
-              <span className="text-[10px] font-black uppercase tracking-wider bg-sky-600/90 backdrop-blur-xs text-white px-2.5 py-1 rounded-lg shadow-sm">
-                ❄️ Cold-Chain
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Product Info */}
-        <div className="p-5">
-          <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-800 uppercase tracking-wider mb-1">
-            <MapPin className="w-3 h-3 text-amber-600" />
-            <span>{product.origin}</span>
-            <span>&bull;</span>
-            <span className="text-slate-400 font-mono">HSN {product.hsn_code}</span>
-          </div>
-
-          <h3 className="text-base font-black text-slate-900 group-hover:text-emerald-900 transition leading-snug">
-            {product.name}
+      <div className="flex flex-1 flex-col pt-5">
+        <Link href={href} className="group">
+          <h3 className="font-display text-[21px] leading-[1.2] text-ink decoration-1 underline-offset-4 group-hover:underline">
+            {title}
           </h3>
+        </Link>
+        {product.name_hindi && (
+          <p lang="hi" className="font-hindi mt-1 text-[15px] text-muted">
+            {product.name_hindi}
+          </p>
+        )}
+        <p className="mt-2 text-[14px] leading-relaxed text-ink-2">
+          {qualifier ? `${qualifier}. ` : ""}
+          From {product.origin.split(",")[0]}.
+          {product.is_perishable ? " Travels chilled." : ""}
+        </p>
 
-          <p className="text-xs text-slate-500 line-clamp-2 mt-1.5 font-normal leading-relaxed">
-            {product.description}
+        {product.variants.length > 1 && (
+          <div role="radiogroup" aria-label="Pack size" className="mt-4 flex flex-wrap gap-1.5">
+            {product.variants.map((v, i) => (
+              <button
+                key={v.id}
+                role="radio"
+                aria-checked={i === variantIndex}
+                onClick={() => selectVariant(i)}
+                className={`flex h-9 items-center rounded-full border px-3.5 text-[13px] sm:h-8 sm:px-3 transition-colors ${
+                  i === variantIndex ? "border-ink bg-ink text-white" : "border-line text-ink-2 hover:border-ink"
+                }`}
+              >
+                {v.pack_size}
+              </button>
+            ))}
+          </div>
+        )}
+        {product.variants.length === 1 && variant && (
+          <p className="mt-4 flex h-9 items-center text-[13px] text-muted sm:h-8">{variant.pack_size}</p>
+        )}
+
+        <div className="mt-auto pt-5">
+          <div className="flex items-baseline justify-between gap-3 border-t border-line pt-4">
+            <p className="tabular text-[20px] leading-none">
+              <span className={discounted ? "text-royal" : "text-ink"}>{inr(unitPrice)}</span>
+              <span className="ml-1.5 text-[14px] text-muted">per {variant ? unitLabel(variant.unit) : "unit"}</span>
+            </p>
+            {discounted && variant && <s className="tabular text-[14px] text-muted">{inr(variant.base_price)}</s>}
+          </div>
+          <p className="mt-1.5 min-h-[20px] text-[13px] text-muted">
+            {nextSlab && variant
+              ? `${inr(nextSlab.slab_price)} each when you order ${nextSlab.min_qty} or more`
+              : product.gst_rate > 0
+                ? `Plus ${product.gst_rate}% GST`
+                : "No GST on this item"}
           </p>
 
-          {/* Pack Size Pills */}
-          <div className="mt-4">
-            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
-              Select Pack Size:
-            </label>
-            <div className="flex flex-wrap gap-1.5">
-              {product.variants.map((v, i) => (
-                <button
-                  key={v.id}
-                  onClick={(e) => handleVariantChange(i, e)}
-                  className={`text-xs px-2.5 py-1 rounded-lg font-bold border transition cursor-pointer ${
-                    i === selectedVariantIndex
-                      ? "bg-emerald-900 text-white border-emerald-950 shadow-xs"
-                      : "bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200"
-                  }`}
+          <div className="mt-4 flex items-center gap-2">
+            <QtyStepper
+              qty={qty}
+              min={variant?.moq || 1}
+              onChange={setQty}
+              label={variant ? unitLabel(variant.unit, 2) : "units"}
+            />
+            <button
+              onClick={add}
+              disabled={!variant?.in_stock}
+              className="relative h-11 flex-1 overflow-hidden rounded-full bg-ink px-4 text-[14px] text-white transition-colors hover:bg-ink-2 disabled:bg-line disabled:text-muted"
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={added ? "added" : "add"}
+                  initial={{ y: 14, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -14, opacity: 0 }}
+                  transition={{ duration: 0.18 }}
+                  className="block"
                 >
-                  {v.pack_size}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Bulk Tier Slab Hints */}
-          {selectedVariant && selectedVariant.slabs.length > 0 && (
-            <div className="mt-3 bg-amber-50/80 border border-amber-200/80 rounded-xl p-2.5 text-xs text-amber-900">
-              <span className="font-bold flex items-center gap-1 mb-1 text-amber-950 text-[11px]">
-                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                Bulk Tier Discounts:
-              </span>
-              <div className="grid grid-cols-2 gap-1 text-[11px]">
-                {selectedVariant.slabs.map((s, idx) => (
-                  <span key={idx} className="bg-white/90 px-1.5 py-0.5 rounded border border-amber-200 font-medium">
-                    {s.min_qty}–{s.max_qty} {selectedVariant.unit}s: <strong className="text-emerald-900">₹{s.slab_price}</strong>
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Stock & Expiry FEFO info */}
-          <div className="mt-3.5 flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
-            <span className="flex items-center gap-1 font-medium text-[11px]">
-              <Clock className="w-3.5 h-3.5 text-emerald-600" />
-              Shelf Life: {product.shelf_life_days}d
-            </span>
-            <span className={`font-bold text-[11px] ${selectedVariant?.in_stock ? "text-emerald-700" : "text-rose-600"}`}>
-              {selectedVariant?.in_stock ? `✓ In Stock (${selectedVariant.available_stock})` : "Out of Stock"}
-            </span>
+                  {!variant?.in_stock ? "Out of stock" : added ? `Added ${qty} to order` : `Add ${inr(unitPrice * qty)}`}
+                </motion.span>
+              </AnimatePresence>
+            </button>
           </div>
         </div>
       </div>
-
-      {/* Pricing & Add to Cart Footer */}
-      <div className="p-5 bg-slate-50/80 border-t border-slate-100 mt-2">
-        <div className="flex items-end justify-between mb-3">
-          <div>
-            <span className="text-[10px] text-slate-500 font-medium block">
-              Unit Rate ({product.gst_rate}% GST extra):
-            </span>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-xl font-black text-emerald-950 font-mono">
-                ₹{effectiveUnitPrice.toLocaleString("en-IN")}
-              </span>
-              {isBulkDiscountApplied && (
-                <span className="text-xs line-through text-slate-400 font-mono">
-                  ₹{selectedVariant?.base_price}
-                </span>
-              )}
-              <span className="text-xs text-slate-500">/{selectedVariant?.unit}</span>
-            </div>
-          </div>
-
-          <div className="text-right">
-            <span className="text-[10px] text-slate-400 uppercase font-bold block">Subtotal</span>
-            <span className="text-base font-black text-slate-900 font-mono">
-              ₹{totalPrice.toLocaleString("en-IN")}
-            </span>
-          </div>
-        </div>
-
-        {/* Quantity Controls & Add Button */}
-        <div className="flex items-center gap-2">
-          <div 
-            onClick={(e) => e.stopPropagation()} 
-            className="flex items-center border border-slate-200 rounded-xl bg-white shadow-xs p-1"
-          >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setQty(Math.max(selectedVariant?.moq || 1, qty - 1));
-              }}
-              disabled={qty <= (selectedVariant?.moq || 1)}
-              className="p-1 rounded-lg hover:bg-slate-100 disabled:opacity-30 transition cursor-pointer"
-            >
-              <Minus className="w-3.5 h-3.5 text-slate-700" />
-            </button>
-            <span className="px-3 font-bold text-sm text-slate-900 font-mono">
-              {qty}
-            </span>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setQty(qty + 1);
-              }}
-              className="p-1 rounded-lg hover:bg-slate-100 transition cursor-pointer"
-            >
-              <Plus className="w-3.5 h-3.5 text-slate-700" />
-            </button>
-          </div>
-
-          <button
-            onClick={handleAdd}
-            disabled={!selectedVariant?.in_stock}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-3 px-4 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-sm ${
-              added
-                ? "bg-emerald-600 text-white"
-                : selectedVariant?.in_stock
-                ? "bg-emerald-900 hover:bg-emerald-800 text-white active:scale-98"
-                : "bg-slate-200 text-slate-400 cursor-not-allowed"
-            }`}
-          >
-            <ShoppingBag className="w-3.5 h-3.5 text-amber-300" />
-            <span>{added ? "Added ✓" : `Add (MOQ: ${selectedVariant?.moq})`}</span>
-          </button>
-        </div>
-      </div>
-    </div>
+    </article>
   );
 };

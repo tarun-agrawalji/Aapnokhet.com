@@ -1,327 +1,228 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
+import { AnimatePresence, motion } from "motion/react";
+import { Search } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { ProductCard } from "@/components/ProductCard";
-import { InstagramReelsSection } from "@/components/InstagramReelsSection";
-import { TestimonialsSection } from "@/components/TestimonialsSection";
-import { AboutUsSection } from "@/components/AboutUsSection";
 import { CartDrawer } from "@/components/CartDrawer";
 import { BuyerDashboard } from "@/components/BuyerDashboard";
-import { 
-  ShieldCheck, Truck, Sparkles, Search, 
-  CheckCircle2, ChevronRight, Phone, Mail, MapPin, 
-  Clock, ArrowRight, Building2, Flame, Award 
-} from "lucide-react";
-
-import { PRODUCTS, Product } from "@/data/products";
+import { TodaysRates } from "@/components/TodaysRates";
+import { HowOrdering, QualityReport, Voices, SiteFooter } from "@/components/HomeSections";
+import { PRODUCTS } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 
+const CATEGORIES = [
+  { slug: "all", label: "All" },
+  { slug: "flour", label: "Atta and flour" },
+  { slug: "rice", label: "Rice" },
+  { slug: "pulses", label: "Dal" },
+  { slug: "dairy", label: "Dairy and ghee" },
+];
+
+const PROMISES = [
+  { title: "Delivered by 6 AM", body: "Order by 10 PM and it reaches your kitchen before prep the next morning." },
+  { title: "15 days to pay", body: "A credit account opens once your GSTIN and FSSAI licence are verified." },
+  { title: "Lab-tested batches", body: "Moisture, purity and pesticide checks on every lot before it ships." },
+  { title: "GST invoice each time", body: "HSN-wise tax split on every order, ready for your accountant." },
+];
+
+const rise = {
+  hidden: { opacity: 0, y: 18 },
+  show: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: 0.12 + i * 0.09, duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
+  }),
+};
+
 export default function Home() {
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("all");
+  const [query, setQuery] = useState("");
   const [showDashboard, setShowDashboard] = useState(false);
 
-  // Cart state from shared context
-  const {
-    items: cartItems,
-    addToCart,
-    removeItem,
-    isCartOpen,
-    setIsCartOpen,
-    subtotal,
-    taxTotal,
-    grandTotal
-  } = useCart();
+  const { items, addToCart, removeItem, isCartOpen, setIsCartOpen, subtotal, taxTotal, grandTotal, totalItemCount } = useCart();
 
-  const handleAddToCart = (variantId: string, qty: number) => {
-    addToCart(variantId, qty);
-  };
-
-  const handleRemoveCartItem = (id: string) => {
-    removeItem(id);
-  };
-
-  const handleReorder = (orderId: string) => {
+  const handleReorder = () => {
     addToCart("var-01", 2);
     addToCart("var-03", 1);
     setShowDashboard(false);
     setIsCartOpen(true);
   };
 
-  // Filtered Products
-  const filteredProducts = PRODUCTS.filter((p) => {
-    const matchesCat = activeCategory === "all" || p.category_slug === activeCategory;
-    const matchesQuery =
-      searchQuery === "" ||
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCat && matchesQuery;
-  });
+  const q = query.trim().toLowerCase();
+  const products = PRODUCTS.filter(
+    (p) =>
+      (category === "all" || p.category_slug === category) &&
+      (!q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q) || (p.name_hindi ?? "").includes(query.trim()))
+  );
 
   return (
-    <div className="min-h-screen bg-slate-50/60 flex flex-col font-sans">
-      {/* Navbar with brand navigation and authentication state */}
+    <div className="flex min-h-screen flex-col bg-paper">
       <Navbar
-        cartCount={cartItems.length}
+        cartCount={totalItemCount}
         openCart={() => setIsCartOpen(true)}
-        onToggleDashboard={() => setShowDashboard(!showDashboard)}
+        onToggleDashboard={() => {
+          setShowDashboard((v) => !v);
+          setTimeout(() => document.getElementById("supplies")?.scrollIntoView(), 50);
+        }}
       />
 
-      {/* Main Buyer Storefront & Commercial Catalog */}
       <main className="flex-1">
-          {/* Hero Banner Section */}
-          <div className="relative bg-gradient-to-r from-emerald-950 via-emerald-900 to-amber-950 text-white py-16 px-4 sm:px-6 lg:px-8 border-b border-amber-500/20 overflow-hidden">
-            {/* Background Texture elements */}
-            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]" />
-            
-            <div className="max-w-7xl mx-auto relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
-              <div className="max-w-2xl space-y-5">
-                <div className="inline-flex items-center gap-2 bg-amber-400/15 border border-amber-400/40 rounded-full px-4 py-1.5 text-xs font-bold text-amber-300">
-                  <ShieldCheck className="w-4 h-4 text-amber-400" />
-                  No Outside Sellers &bull; 100% Owned Warehouse Stock
-                </div>
-
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
-                  Pure Raw Food Supplies For Restaurants & Commercial Kitchens.
-                </h1>
-
-                <p className="text-emerald-100 text-sm sm:text-base leading-relaxed font-normal">
-                  Order stone-ground chakki wheat flour, 2-year aged basmati rice, unpolished native dals, and temperature-controlled malai paneer. Direct warehouse dispatch with Net 15 credit terms and GST invoices.
-                </p>
-
-                <div className="flex flex-wrap items-center gap-3 pt-2">
-                  <a
-                    href="#supplies"
-                    className="bg-amber-400 hover:bg-amber-300 text-emerald-950 font-black text-xs uppercase tracking-wider py-3.5 px-6 rounded-2xl shadow-xl transition cursor-pointer flex items-center gap-2"
-                  >
-                    <span>Browse Raw Supplies</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-
-                  <button
-                    onClick={() => setShowDashboard(!showDashboard)}
-                    className="bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold text-xs uppercase tracking-wider py-3.5 px-5 rounded-2xl backdrop-blur-xs transition cursor-pointer"
-                  >
-                    {showDashboard ? "Close Dashboard" : "My Orders & Credit Ledger"}
-                  </button>
-                </div>
-
-                {/* Trust Badges */}
-                <div className="flex items-center gap-4 pt-2 text-xs text-emerald-200">
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400" />
-                    <span>Net 15 Approved Credit</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <CheckCircle2 className="w-4 h-4 text-amber-400" />
-                    <span>Next Morning 6 AM Slot</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Hero Feature Card */}
-              <div className="w-full lg:w-96 bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-6 text-white space-y-4 shadow-2xl">
-                <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                  <span className="text-xs font-black uppercase tracking-wider text-amber-300">
-                    AapnoKhet Core Standards
-                  </span>
-                  <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30 font-bold">
-                    Direct Mandi
-                  </span>
-                </div>
-
-                <div className="text-xs space-y-3 text-emerald-100">
-                  <div className="flex items-start gap-2.5">
-                    <span className="text-amber-400 font-bold text-sm">🌾</span>
-                    <div>
-                      <strong className="text-white block">Stone-Ground Milling:</strong>
-                      <span>Milled fresh in our central Jaipur agro park chakki to keep natural wheat germ intact.</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2.5">
-                    <span className="text-amber-400 font-bold text-sm">❄️</span>
-                    <div>
-                      <strong className="text-white block">Cold-Chain Fleet:</strong>
-                      <span>Fresh paneer transported strictly in refrigerated vans at 3.5°C directly to kitchen docks.</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2.5">
-                    <span className="text-amber-400 font-bold text-sm">📄</span>
-                    <div>
-                      <strong className="text-white block">Automated GST Invoicing:</strong>
-                      <span>Sequential tax invoices, HSN-wise rate split, and monthly GSTR export summaries.</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Hero */}
+        <section className="mx-auto grid max-w-[1240px] items-center gap-10 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-12 lg:gap-8 lg:px-10 lg:pb-24 lg:pt-16">
+          <div className="lg:col-span-6">
+            <motion.h1
+              custom={0}
+              initial="hidden"
+              animate="show"
+              variants={rise}
+              className="font-display text-balance text-[44px] leading-[1.03] tracking-[-0.02em] sm:text-[58px] lg:text-[62px]"
+            >
+              Staples for kitchens that cook every day.
+            </motion.h1>
+            <motion.p
+              custom={1}
+              initial="hidden"
+              animate="show"
+              variants={rise}
+              className="mt-7 max-w-[44ch] text-[17px] leading-relaxed text-ink-2"
+            >
+              Stone-milled atta, aged basmati, unpolished dal and chilled dairy, sent from our Jaipur warehouse to your back door. Every
+              batch is lab-tested. Pay in 15 days, with a GST invoice for each order.
+            </motion.p>
+            <motion.div custom={2} initial="hidden" animate="show" variants={rise} className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <a href="#supplies" className="rounded-full bg-ink px-6 py-3.5 text-[15px] text-white transition-colors hover:bg-ink-2">
+                See today&apos;s prices
+              </a>
+              <Link href="/login?tab=register" className="text-[15px] text-ink underline decoration-line decoration-1 underline-offset-[6px] transition-colors hover:decoration-ink">
+                Open a business account
+              </Link>
+            </motion.div>
           </div>
 
-          <div id="supplies" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            {/* Buyer Account Dashboard (if toggled) */}
+          <div className="lg:col-span-6 lg:col-start-7">
+            <TodaysRates />
+          </div>
+        </section>
+
+        {/* What you can count on */}
+        <section aria-label="What you can count on" className="border-y border-line">
+          <dl className="mx-auto grid max-w-[1240px] grid-cols-1 divide-y divide-line px-4 sm:grid-cols-2 sm:divide-y-0 sm:px-6 lg:grid-cols-4 lg:divide-x lg:px-10">
+            {PROMISES.map((p, i) => (
+              <div key={p.title} className={`py-7 sm:py-9 lg:px-7 ${i === 0 ? "lg:pl-0" : ""} ${i === PROMISES.length - 1 ? "lg:pr-0" : ""}`}>
+                <dt className="text-[16px] text-ink">{p.title}</dt>
+                <dd className="mt-1.5 max-w-[36ch] text-[14px] leading-relaxed text-muted">{p.body}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        {/* Supplies */}
+        <section id="supplies" className="mx-auto max-w-[1240px] px-4 py-24 sm:px-6 lg:px-10 lg:py-32">
+          <AnimatePresence>
             {showDashboard && (
-              <BuyerDashboard onReorder={handleReorder} />
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+              >
+                <BuyerDashboard onReorder={handleReorder} onClose={() => setShowDashboard(false)} />
+              </motion.div>
             )}
+          </AnimatePresence>
 
-            {/* Section Header */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-              <div>
-                <span className="text-xs font-black uppercase tracking-wider text-amber-700 bg-amber-100 px-2.5 py-1 rounded-md">
-                  Wholesale Kitchen Supplies
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mt-2 tracking-tight">
-                  Commercial Raw Materials Catalog
-                </h2>
-                <p className="text-xs text-slate-500 mt-1">
-                  Click any product to inspect specifications, bulk slabs, and available pack sizes.
-                </p>
-              </div>
-
-              {/* Search Bar */}
-              <div className="relative w-full md:w-80">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search atta, basmati, dals, paneer..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full text-xs font-medium pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-emerald-800 shadow-xs"
-                />
-              </div>
+          <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="font-display text-[34px] leading-[1.1] tracking-[-0.01em] sm:text-[44px]">Supplies</h2>
+              <p className="mt-3 max-w-[52ch] text-[16px] leading-relaxed text-ink-2">
+                Prices are per pack and fall automatically at bulk quantities. Change the pack size or count on any item to see yours.
+              </p>
             </div>
+            <label className="relative block w-full md:w-80">
+              <span className="sr-only">Search supplies</span>
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.6} />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search atta, basmati, paneer"
+                className="h-11 w-full rounded-full border border-line bg-paper pl-11 pr-4 text-[16px] outline-none transition-colors placeholder:text-muted focus:border-ink"
+              />
+            </label>
+          </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex overflow-x-auto gap-2.5 pb-2 mb-8 no-scrollbar">
-              {[
-                { slug: "all", label: "All Supplies", icon: "🌾" },
-                { slug: "flour", label: "Wheat & Flours", icon: "🍞" },
-                { slug: "rice", label: "Rice & Grains", icon: "🍚" },
-                { slug: "pulses", label: "Pulses & Dals", icon: "🥣" },
-                { slug: "dairy", label: "Pure Dairy & Ghee", icon: "🧈" },
-              ].map((cat) => (
+          <div role="tablist" aria-label="Categories" className="no-scrollbar -mx-4 mt-10 flex gap-7 overflow-x-auto border-b border-line px-4 sm:mx-0 sm:px-0">
+            {CATEGORIES.map((c) => {
+              const active = category === c.slug;
+              return (
                 <button
-                  key={cat.slug}
-                  onClick={() => setActiveCategory(cat.slug)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition cursor-pointer border ${
-                    activeCategory === cat.slug
-                      ? "bg-emerald-900 text-white border-emerald-950 shadow-md"
-                      : "bg-white hover:bg-slate-100 text-slate-700 border-slate-200"
-                  }`}
+                  key={c.slug}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setCategory(c.slug)}
+                  className={`relative whitespace-nowrap pb-3.5 text-[15px] transition-colors ${active ? "text-ink" : "text-muted hover:text-ink"}`}
                 >
-                  <span className="text-sm">{cat.icon}</span>
-                  <span>{cat.label}</span>
+                  {c.label}
+                  {active && (
+                    <motion.span layoutId="category-underline" className="absolute inset-x-0 -bottom-px h-[2px] bg-ink" transition={{ type: "spring", stiffness: 500, damping: 40 }} />
+                  )}
                 </button>
-              ))}
+              );
+            })}
+          </div>
+
+          {products.length > 0 ? (
+            <motion.div layout className="mt-12 grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+              <AnimatePresence mode="popLayout">
+                {products.map((p) => (
+                  <motion.div
+                    key={p.id}
+                    layout
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    <ProductCard product={p} onAddToCart={addToCart} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          ) : (
+            <div className="mt-12 max-w-[48ch]">
+              <p className="text-[17px] text-ink">Nothing matches &ldquo;{query}&rdquo;.</p>
+              <p className="mt-2 text-[15px] text-ink-2">
+                Try a simpler word like atta, rice or ghee, or{" "}
+                <button onClick={() => { setQuery(""); setCategory("all"); }} className="underline underline-offset-4">
+                  show all supplies
+                </button>
+                .
+              </p>
             </div>
+          )}
+        </section>
 
-            {/* Products Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-              {filteredProducts.map((p) => (
-                <ProductCard
-                  key={p.id}
-                  product={p}
-                  onAddToCart={handleAddToCart}
-                />
-              ))}
-            </div>
-          </div>
+        <HowOrdering />
+        <QualityReport />
+        <Voices />
+      </main>
 
-          {/* Section: Instagram Reels / Videos */}
-          <div id="reels">
-            <InstagramReelsSection />
-          </div>
+      <SiteFooter />
 
-          {/* Section: Testimonials & Chef Reviews */}
-          <div id="testimonials">
-            <TestimonialsSection />
-          </div>
-
-          {/* Section: About Us & Our Purity Story */}
-          <div id="about-us">
-            <AboutUsSection />
-          </div>
-        </main>
-
-      {/* Slide-over Cart Drawer */}
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
-        items={cartItems}
+        items={items}
         subtotal={subtotal}
         taxTotal={taxTotal}
         grandTotal={grandTotal}
-        onRemoveItem={handleRemoveCartItem}
+        onRemoveItem={removeItem}
         onCheckoutSuccess={() => {}}
       />
-
-      {/* Footer */}
-      <footer className="bg-emerald-950 text-white pt-16 pb-8 border-t border-amber-500/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-emerald-900 text-xs">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2.5">
-              <span className="text-3xl">🌾</span>
-              <div>
-                <span className="text-2xl font-black text-white">AapnoKhet</span>
-                <span className="text-[10px] text-amber-400 block font-bold uppercase tracking-wider">
-                  Pure Food Direct Supply
-                </span>
-              </div>
-            </div>
-            <p className="text-emerald-300 leading-relaxed font-normal">
-              Direct supply of unadulterated Sharbati wheat flour, 2-year aged Basmati rice, unpolished pulses, and cold-chain dairy to restaurants, hotels, and cloud kitchens.
-            </p>
-            <div className="p-3 bg-emerald-900/50 rounded-xl border border-emerald-800 text-amber-300 font-bold">
-              FSSAI Central Licence # 12226999000845
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="font-bold text-white uppercase tracking-wider text-sm">Commercial Supplies</h4>
-            <ul className="space-y-2 text-emerald-300">
-              <li><a href="#supplies" className="hover:text-amber-300 transition">Stone-Ground Sharbati Atta (50kg)</a></li>
-              <li><a href="#supplies" className="hover:text-amber-300 transition">1121 Royal Steam Basmati Rice (25kg)</a></li>
-              <li><a href="#supplies" className="hover:text-amber-300 transition">Fresh Malai Paneer (Cold Chain 5kg)</a></li>
-              <li><a href="#supplies" className="hover:text-amber-300 transition">Unpolished Desi Toor Dal (30kg)</a></li>
-              <li><a href="#supplies" className="hover:text-amber-300 transition">Bilona Pure Cow Ghee (15kg Tin)</a></li>
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="font-bold text-white uppercase tracking-wider text-sm">Platform & Trust</h4>
-            <ul className="space-y-2 text-emerald-300">
-              <li><a href="#about-us" className="hover:text-amber-300 transition">About Our Direct Supply Model</a></li>
-              <li><a href="#reels" className="hover:text-amber-300 transition">Kitchen Prep Stories & Reels</a></li>
-              <li><a href="#testimonials" className="hover:text-amber-300 transition">Chef & Restaurant Reviews</a></li>
-              <li><span className="text-slate-400">FEFO Expiry-First Warehouse Protocol</span></li>
-              <li><span className="text-slate-400">Net 15 Approved Credit Accounts</span></li>
-            </ul>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="font-bold text-white uppercase tracking-wider text-sm">Depot & Orders Desk</h4>
-            <p className="text-emerald-300 flex items-start gap-2.5 leading-relaxed">
-              <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-              <span>Plot 42, Agro Food Park, RIICO Industrial Area, Mansarovar, Jaipur - 302020</span>
-            </p>
-            <p className="text-emerald-300 flex items-center gap-2">
-              <Phone className="w-4 h-4 text-amber-400" />
-              <span className="font-mono font-bold">+91 98290 12345 (Orders Desk)</span>
-            </p>
-            <p className="text-emerald-300 flex items-center gap-2">
-              <Mail className="w-4 h-4 text-amber-400" />
-              <span>orders@aapnokhet.com</span>
-            </p>
-          </div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 flex flex-col sm:flex-row justify-between items-center text-[11px] text-emerald-400 gap-2">
-          <p>&copy; 2026 AapnoKhet Pure Food Supply Chain Pvt Ltd. All rights reserved.</p>
-          <p>GST & FSSAI Compliant B2B Direct Food Supply Chain Platform.</p>
-        </div>
-      </footer>
     </div>
   );
 }
