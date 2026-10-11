@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { 
   Plus, Minus, ShoppingBag, Sparkles, Clock, 
-  MapPin, Eye, CheckCircle2 
+  MapPin, Eye, CheckCircle2, ArrowRight 
 } from "lucide-react";
 
 interface Variant {
@@ -38,7 +40,7 @@ interface Product {
 interface ProductCardProps {
   product: Product;
   onAddToCart: (variantId: string, qty: number) => void;
-  onSelectProduct: (product: Product) => void;
+  onSelectProduct?: (product: Product) => void;
   lang: "EN" | "HI";
 }
 
@@ -48,6 +50,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onSelectProduct,
   lang
 }) => {
+  const router = useRouter();
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const selectedVariant = product.variants[selectedVariantIndex] || product.variants[0];
   const [qty, setQty] = useState(selectedVariant?.moq || 1);
@@ -55,7 +58,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   // Sync qty with variant MOQ when changing pack size
   const handleVariantChange = (index: number, e: React.MouseEvent) => {
-    e.stopPropagation(); // Avoid opening modal on pill click
+    e.stopPropagation(); // Avoid opening page on pill click
     setSelectedVariantIndex(index);
     const newVar = product.variants[index];
     if (newVar && qty < newVar.moq) {
@@ -84,9 +87,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     setTimeout(() => setAdded(false), 1400);
   };
 
+  const handleCardClick = () => {
+    router.push(`/products/${product.slug}`);
+    if (onSelectProduct) {
+      onSelectProduct(product);
+    }
+  };
+
   return (
     <div
-      onClick={() => onSelectProduct(product)}
+      onClick={handleCardClick}
       className="bg-white rounded-3xl border border-amber-100 hover:border-amber-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group cursor-pointer"
     >
       <div>
@@ -97,10 +107,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-            <span className="text-white text-xs font-bold flex items-center gap-1">
-              <Eye className="w-3.5 h-3.5 text-amber-300" />
-              Click to View Details & Specifications
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+            <span className="text-white text-xs font-bold flex items-center gap-1.5">
+              <span>View Full Product Page & Slabs</span>
+              <ArrowRight className="w-3.5 h-3.5 text-amber-300" />
             </span>
           </div>
 

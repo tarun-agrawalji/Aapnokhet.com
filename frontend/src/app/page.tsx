@@ -17,173 +17,8 @@ import {
   Clock, ArrowRight, Building2, Flame, Award 
 } from "lucide-react";
 
-// Master Products With High-Resolution Images & Full Specs
-const INITIAL_PRODUCTS = [
-  {
-    id: "prod-01",
-    name: "Sharbati Whole Wheat Atta (Chakki Fresh)",
-    name_hindi: "शरबती शुद्ध चक्की आटा",
-    slug: "sharbati-whole-wheat-atta",
-    brand: "AapnoKhet Pure",
-    category_slug: "flour",
-    hsn_code: "1101",
-    gst_rate: 0.0,
-    origin: "Sehore, Madhya Pradesh & Rajasthan",
-    grade: "Grade A+ Golden Grain",
-    description: "Stone ground chakki atta from hand-sorted golden Sharbati wheat grains. Rotis puff high and remain soft for over 8 hours in commercial kitchen warmers.",
-    shelf_life_days: 90,
-    is_perishable: false,
-    image_url: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop",
-    variants: [
-      {
-        id: "var-01",
-        sku: "AK-ATTA-SHAR-50KG",
-        pack_size: "50 kg Bag",
-        unit: "Bag",
-        base_price: 1850,
-        moq: 1,
-        available_stock: 230,
-        in_stock: true,
-        slabs: [
-          { min_qty: 1, max_qty: 4, slab_price: 1850 },
-          { min_qty: 5, max_qty: 19, slab_price: 1780 },
-          { min_qty: 20, max_qty: 100, slab_price: 1720 }
-        ]
-      },
-      {
-        id: "var-02",
-        sku: "AK-ATTA-SHAR-25KG",
-        pack_size: "25 kg Bag",
-        unit: "Bag",
-        base_price: 950,
-        moq: 2,
-        available_stock: 120,
-        in_stock: true,
-        slabs: []
-      }
-    ]
-  },
-  {
-    id: "prod-02",
-    name: "1121 Royal Steam Basmati Rice (2-Year Aged)",
-    name_hindi: "1121 रॉयल बासमती चावल (२ वर्ष पुराना)",
-    slug: "1121-royal-steam-basmati-rice",
-    brand: "AapnoKhet Pure",
-    category_slug: "rice",
-    hsn_code: "1006",
-    gst_rate: 5.0,
-    origin: "Taraori, Haryana",
-    grade: "Extra Long Grain (8.35mm)",
-    description: "Naturally aged 2-year royal steam basmati with exceptional aroma. Elongates 2.5x without clumping. Ideal for dum biryanis and pulao.",
-    shelf_life_days: 720,
-    is_perishable: false,
-    image_url: "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=800&auto=format&fit=crop",
-    variants: [
-      {
-        id: "var-03",
-        sku: "AK-RICE-BAS1121-25KG",
-        pack_size: "25 kg Bag",
-        unit: "Bag",
-        base_price: 2450,
-        moq: 1,
-        available_stock: 200,
-        in_stock: true,
-        slabs: [
-          { min_qty: 1, max_qty: 3, slab_price: 2450 },
-          { min_qty: 4, max_qty: 15, slab_price: 2350 },
-          { min_qty: 16, max_qty: 100, slab_price: 2250 }
-        ]
-      }
-    ]
-  },
-  {
-    id: "prod-03",
-    name: "Fresh Commercial Malai Paneer (Cold Chain)",
-    name_hindi: "ताज़ा मलाई पनीर (कोल्ड चेन डिलीवरी)",
-    slug: "fresh-commercial-malai-paneer",
-    brand: "AapnoKhet Dairy Pure",
-    category_slug: "dairy",
-    hsn_code: "0406",
-    gst_rate: 5.0,
-    origin: "Jaipur Dairy Farm, Rajasthan",
-    grade: "Full Cream Malai (50%+ Fat)",
-    description: "Freshly curdled buffalo milk paneer with ultra-soft texture. Delivered in temperature controlled refrigerated vans at 3.5°C before 9 AM.",
-    shelf_life_days: 10,
-    is_perishable: true,
-    image_url: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=800&auto=format&fit=crop",
-    variants: [
-      {
-        id: "var-04",
-        sku: "AK-PANEER-MALAI-5KG",
-        pack_size: "5 kg Block",
-        unit: "Block",
-        base_price: 1650,
-        moq: 1,
-        available_stock: 50,
-        in_stock: true,
-        slabs: []
-      }
-    ]
-  },
-  {
-    id: "prod-04",
-    name: "Unpolished Desi Toor Dal (Arhar Dal)",
-    name_hindi: "देसी अनपॉलिश्ड तुअर / अरहर दाल",
-    slug: "unpolished-desi-toor-dal",
-    brand: "AapnoKhet Pure",
-    category_slug: "pulses",
-    hsn_code: "0713",
-    gst_rate: 0.0,
-    origin: "Gulbarga, Karnataka",
-    grade: "Grade A Unpolished",
-    description: "Zero oil, water, or color polishing. High natural protein with authentic rich taste and fast boiling time in commercial pressure steamers.",
-    shelf_life_days: 180,
-    is_perishable: false,
-    image_url: "https://images.unsplash.com/photo-1585409677983-0f6c41ca9c3b?w=800&auto=format&fit=crop",
-    variants: [
-      {
-        id: "var-05",
-        sku: "AK-DAL-TOOR-30KG",
-        pack_size: "30 kg Bag",
-        unit: "Bag",
-        base_price: 4350,
-        moq: 1,
-        available_stock: 120,
-        in_stock: true,
-        slabs: []
-      }
-    ]
-  },
-  {
-    id: "prod-05",
-    name: "Danedar Pure Cow Ghee (Bilona Method)",
-    name_hindi: "दानेदार शुद्ध गाय का देसी घी",
-    slug: "danedar-pure-cow-ghee-15kg",
-    brand: "AapnoKhet Pure",
-    category_slug: "dairy",
-    hsn_code: "0405",
-    gst_rate: 12.0,
-    origin: "Tharparkar Cows, Rajasthan",
-    grade: "Pure Bilona Danedar",
-    description: "Prepared from curd using traditional wooden churn bilona process. Granular golden texture with rich earthy aroma and zero synthetic adulteration.",
-    shelf_life_days: 365,
-    is_perishable: false,
-    image_url: "https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=800&auto=format&fit=crop",
-    variants: [
-      {
-        id: "var-06",
-        sku: "AK-GHEE-COW-15TIN",
-        pack_size: "15 kg Tin",
-        unit: "Tin",
-        base_price: 9750,
-        moq: 1,
-        available_stock: 40,
-        in_stock: true,
-        slabs: []
-      }
-    ]
-  }
-];
+import { PRODUCTS, Product } from "@/data/products";
+import { useCart } from "@/context/CartContext";
 
 export default function Home() {
   const [activeView, setActiveView] = useState<"buyer" | "admin" | "driver">("buyer");
@@ -195,109 +30,35 @@ export default function Home() {
   // Selected Product Modal state
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
-  // Cart state
-  const [cartItems, setCartItems] = useState<any[]>([
-    {
-      id: "item-init-1",
-      variant_id: "var-01",
-      sku: "AK-ATTA-SHAR-50KG",
-      product_name: "Sharbati Whole Wheat Atta",
-      pack_size: "50 kg Bag",
-      unit: "Bag",
-      qty: 2,
-      unit_price: 1850,
-      subtotal: 3700,
-      tax_amount: 0,
-      total: 3700
-    }
-  ]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  // Cart state from shared context
+  const {
+    items: cartItems,
+    addToCart,
+    removeItem,
+    isCartOpen,
+    setIsCartOpen,
+    subtotal,
+    taxTotal,
+    grandTotal
+  } = useCart();
 
   const handleAddToCart = (variantId: string, qty: number) => {
-    for (const p of INITIAL_PRODUCTS) {
-      const v = p.variants.find((v) => v.id === variantId);
-      if (v) {
-        const matchingSlab = v.slabs.find((s) => qty >= s.min_qty && qty <= s.max_qty);
-        const unit_price = matchingSlab ? matchingSlab.slab_price : v.base_price;
-        const itemSub = unit_price * qty;
-        const itemTax = (itemSub * p.gst_rate) / 100;
-
-        setCartItems((prev) => {
-          const existing = prev.find((item) => item.variant_id === variantId);
-          if (existing) {
-            return prev.map((item) =>
-              item.variant_id === variantId
-                ? { ...item, qty: item.qty + qty, subtotal: itemSub, total: itemSub + itemTax }
-                : item
-            );
-          }
-          return [
-            ...prev,
-            {
-              id: `item-${Date.now()}`,
-              variant_id: v.id,
-              sku: v.sku,
-              product_name: p.name,
-              pack_size: v.pack_size,
-              unit: v.unit,
-              qty,
-              unit_price,
-              subtotal: itemSub,
-              tax_amount: itemTax,
-              total: itemSub + itemTax
-            }
-          ];
-        });
-        setIsCartOpen(true);
-        break;
-      }
-    }
+    addToCart(variantId, qty);
   };
 
   const handleRemoveCartItem = (id: string) => {
-    setCartItems((prev) => prev.filter((it) => it.id !== id));
+    removeItem(id);
   };
 
   const handleReorder = (orderId: string) => {
-    setCartItems([
-      {
-        id: `item-${Date.now()}-1`,
-        variant_id: "var-01",
-        sku: "AK-ATTA-SHAR-50KG",
-        product_name: "Sharbati Whole Wheat Atta",
-        pack_size: "50 kg Bag",
-        unit: "Bag",
-        qty: 2,
-        unit_price: 1850,
-        subtotal: 3700,
-        tax_amount: 0,
-        total: 3700
-      },
-      {
-        id: `item-${Date.now()}-2`,
-        variant_id: "var-03",
-        sku: "AK-RICE-BAS1121-25KG",
-        product_name: "1121 Royal Steam Basmati Rice",
-        pack_size: "25 kg Bag",
-        unit: "Bag",
-        qty: 1,
-        unit_price: 2450,
-        subtotal: 2450,
-        tax_amount: 122.5,
-        total: 2572.5
-      }
-    ]);
+    addToCart("var-01", 2);
+    addToCart("var-03", 1);
     setShowDashboard(false);
     setIsCartOpen(true);
   };
 
-  // Cart calculations
-  const subtotal = cartItems.reduce((acc, item) => acc + item.subtotal, 0);
-  const taxTotal = cartItems.reduce((acc, item) => acc + item.tax_amount, 0);
-  const grandTotal = subtotal + taxTotal;
-
   // Filtered Products
-  const filteredProducts = INITIAL_PRODUCTS.filter((p) => {
+  const filteredProducts = PRODUCTS.filter((p) => {
     const matchesCat = activeCategory === "all" || p.category_slug === activeCategory;
     const matchesQuery =
       searchQuery === "" ||
@@ -308,14 +69,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50/60 flex flex-col font-sans">
-      {/* Top Notice Announcement Bar */}
-      <div className="bg-amber-400 text-emerald-950 font-bold text-xs py-2 px-4 text-center border-b border-amber-500/30 flex items-center justify-center gap-2">
-        <span>🌾 Fresh Harvest Direct: Sharbati Atta & 1121 Basmati bulk mandi discounts live for verified restaurants!</span>
-        <span className="hidden sm:inline bg-emerald-950 text-amber-300 text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full">
-          Orders before 9 PM ship at 6 AM
-        </span>
-      </div>
-
       {/* Navbar with Mode Switcher & Navigation Links */}
       <Navbar
         activeView={activeView}
