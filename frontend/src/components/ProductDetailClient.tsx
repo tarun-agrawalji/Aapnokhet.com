@@ -91,13 +91,10 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
     <div className="min-h-screen bg-slate-50/70 flex flex-col font-sans">
       {/* Navbar with language and cart controls */}
       <Navbar
-        activeView="buyer"
-        setActiveView={() => {}}
         cartCount={cartItems.length}
         openCart={() => setIsCartOpen(true)}
         lang={lang}
         setLang={setLang}
-        userRole="Commercial Buyer"
       />
 
       <main className="flex-1 pb-20">

@@ -21,7 +21,6 @@ import { PRODUCTS, Product } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 
 export default function Home() {
-  const [activeView, setActiveView] = useState<"buyer" | "admin" | "driver">("buyer");
   const [lang, setLang] = useState<"EN" | "HI">("EN");
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -69,26 +68,17 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50/60 flex flex-col font-sans">
-      {/* Navbar with Mode Switcher & Navigation Links */}
+      {/* Navbar with brand navigation and authentication state */}
       <Navbar
-        activeView={activeView}
-        setActiveView={setActiveView}
         cartCount={cartItems.length}
         openCart={() => setIsCartOpen(true)}
         lang={lang}
         setLang={setLang}
-        userRole="Buyer Owner"
+        onToggleDashboard={() => setShowDashboard(!showDashboard)}
       />
 
-      {/* VIEW 1: ADMIN OPERATIONS CONSOLE */}
-      {activeView === "admin" && <AdminConsole />}
-
-      {/* VIEW 2: DRIVER PWA */}
-      {activeView === "driver" && <DriverPwa />}
-
-      {/* VIEW 3: BUYER STOREFRONT & ORDERING PORTAL */}
-      {activeView === "buyer" && (
-        <main className="flex-1">
+      {/* Main Buyer Storefront & Commercial Catalog */}
+      <main className="flex-1">
           {/* Hero Banner Section */}
           <div className="relative bg-gradient-to-r from-emerald-950 via-emerald-900 to-amber-950 text-white py-16 px-4 sm:px-6 lg:px-8 border-b border-amber-500/20 overflow-hidden">
             {/* Background Texture elements */}
@@ -265,7 +255,6 @@ export default function Home() {
             <AboutUsSection />
           </div>
         </main>
-      )}
 
       {/* Product Detail Modal (On-Click Product Dialog) */}
       <ProductDetailModal
